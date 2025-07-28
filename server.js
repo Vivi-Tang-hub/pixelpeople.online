@@ -1,3 +1,12 @@
+const express = require('express');
+const cors = require('cors');
+const app = express();
+
+// Enable CORS so your GitHub/Domain frontend can talk to the Render backend
+app.use(cors({
+  origin: 'https://pixelpeople.online'  // ✅ your domain here
+}));
+
 require('dotenv').config();
 console.log('Cloud name:', process.env.CLOUDINARY_CLOUD_NAME);
 const express = require('express');
