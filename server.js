@@ -5,6 +5,11 @@ const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
 const path = require('path');
 
+app.use(cors({
+  origin: 'https://pixelpeople.online'
+}));
+
+
 const app = express();
 const PORT = 3000;
 
