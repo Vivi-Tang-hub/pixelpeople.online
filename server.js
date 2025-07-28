@@ -1,26 +1,17 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const app = express();
-
-// Enable CORS so your GitHub/Domain frontend can talk to the Render backend
-app.use(cors({
-  origin: 'https://pixelpeople.online'  // ✅ your domain here
-}));
-
-require('dotenv').config();
-console.log('Cloud name:', process.env.CLOUDINARY_CLOUD_NAME);
-const express = require('express');
 const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
 const path = require('path');
 
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Enable CORS for your frontend domain
 app.use(cors({
   origin: 'https://pixelpeople.online'
 }));
-
-
-const app = express();
-const PORT = 3000;
 
 // Enable file uploads and parse URL-encoded bodies
 app.use(fileUpload());
@@ -36,7 +27,7 @@ cloudinary.config({
 // Serve static files
 app.use(express.static('public'));
 
-// Endpoint to upload files
+// Upload endpoint
 app.post('/upload', (req, res) => {
   if (!req.files || !req.files.image || !req.body.description) {
     return res.status(400).json({ success: false, message: 'No file or description provided.' });
@@ -46,7 +37,6 @@ app.post('/upload', (req, res) => {
   const description = req.body.description;
   console.log(description);
 
-  // Upload the file to Cloudinary with metadata
   cloudinary.uploader.upload_stream(
     { resource_type: 'image', context: `description=${description}` },
     (error, result) => {
@@ -55,7 +45,6 @@ app.post('/upload', (req, res) => {
         return res.status(500).json({ success: false, message: 'Error uploading file.' });
       }
 
-      // Send back the URL and metadata
       res.json({
         success: true,
         message: 'Upload successful',
@@ -66,7 +55,7 @@ app.post('/upload', (req, res) => {
   ).end(image.data);
 });
 
-// Fetch images with metadata
+// Image fetch endpoint
 app.get('/images', async (req, res) => {
   try {
     let allImages = [];
@@ -78,7 +67,7 @@ app.get('/images', async (req, res) => {
         resource_type: 'image',
         max_results: 100,
         next_cursor: nextCursor,
-        context: true, // Fetch metadata
+        context: true,
       });
 
       allImages = allImages.concat(
@@ -103,7 +92,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start the server
+// Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
